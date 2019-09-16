@@ -33,7 +33,7 @@ float find_std(float* data, int len)
 		sum = sum + dev_sq[i];
 	}
 
-	std= sqrt(sum/len);
+	std= sqrt(sum/(len-1));
 
 	return std;
 }
@@ -56,7 +56,7 @@ void find_mean_std2(float*data, int len, float* out_mean, float*out_std)
 	}
 
 	float ave = sum/len;
-	float std_value = sq_sum/len - ave * ave;
+	float std_value = (sq_sum - ave * ave * len)/(len - 1);
 	std_value = sqrt(std_value);
 
 	*out_mean = ave;
