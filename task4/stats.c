@@ -25,13 +25,10 @@ float find_std(float* data, int len)
 
 	for (int i = 0; i <len; i += 1)
 	{
-		dev_sq[i] = pow(data[i] - mean,2);
-	}
-
-	for (int i = 0; i <len; i += 1)
-	{
+		dev_sq[i] = data[i] * data[i];
 		sum = sum + dev_sq[i];
 	}
+	
 
 	std= sqrt(sum/(len-1));
 
