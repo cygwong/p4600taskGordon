@@ -35,7 +35,7 @@ int main(){
 	find_mean_std(y_n,size,&mean,&dev);
 	printf("\n noise: amp is %f, mean is %f, std is %f",amp,mean,dev);
 
-	int ave_block = 20;
+	int ave_block = 50;
 	ave_curve(y_n,y_s,ave_block,size);
 
 	find_mean_std(y_s,size,&mean,&dev);
