@@ -2,13 +2,16 @@
 #include <stdio.h>
 #include <math.h>
 #include <visa.h>
-//#include "../include/visa.h"
+
+#include "curve.h"
+#include "stats.h"
+
 int main(){
-	unsigned char resultBuffer[256];
+	unsigned char resultBuffer[2500];
 	char inq[] = "*IDN?/n";
 	ViStatus status = VI_SUCCESS;
 	ViFindList resourceList;
-	ViUInt32 num_inst;
+	ViUInt32 num_inst;//special in from IVI to standerdize int
 	ViUInt32 resultCount;
 
 	ViSession defaultRM, scopeHandle;
@@ -20,21 +23,15 @@ int main(){
 	int masb;
 
 	status = viOpenDefaultRM(&defaultRM);
-	printf("I am working\n");
 
 	if(status == VI_SUCCESS)
 	{
-		printf("I am working1\n");
 		status = viFindRsrc(defaultRM,"USB[0-9]::?*INSTR",&resourceList,&num_inst,description);
-		printf("I am working2\n");
 		if(status == VI_SUCCESS)
 		{
-			printf("I am working3\n");
 			status = viOpen(defaultRM,description,VI_NULL,VI_NULL,&scopeHandle);
-			printf("I am working4\n");
 			if(status == VI_SUCCESS)
 			{
-				printf("I am working5\n");
 				printf("Opened instriment %s\n",description);
 
 				viWrite(scopeHandle,"*IDN?\n",6,&resultCount);
@@ -43,14 +40,24 @@ int main(){
 				printf("\nResult count: %d\n",resultCount);
 				printf("\nResult buffer: %s\n",resultBuffer);
 
-				viWrite(scopeHandle,"CURV?\n",6,&resultCount);
+				//viWrite(scopeHandle,"DAT:SOU CH1\n",12,&resultCount);
+				//sleep(2);
+				status = viWrite(scopeHandle,"CURV?\n",6,&resultCount);
+				sleep(2);
 				viRead(scopeHandle,dataBuffer,2500,&resultCount);
 
-				for(int i = 0; i <128; i++)
-				{
-					y = dataBuffer[i];
-					printf("\nRaw = %x, Read = %d",y,y);
+				if(status == VI_SUCCESS){
+					printf("Read success, datasize: %d\n",resultCount);
+					for(int i = 0; i <128; i++)
+					{
+						y = dataBuffer[i];
+						printf("\nRaw = %x, Read = %d",y,y);
+					}
 				}
+				else{
+					printf("Data read error\n");
+				}
+				
 			}
 			else{
 				printf("Faild to open %s\n",description );
