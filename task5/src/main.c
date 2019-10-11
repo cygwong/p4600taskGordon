@@ -7,7 +7,11 @@
 #include "stats.h"
 
 int main(){
-	unsigned char resultBuffer[2500];
+	int datasize = 2500;
+	char resultBuffer[256];
+	char diviC[5];
+	float diviF = 0;
+	float resultHold[datasize];
 	char inq[] = "*IDN?/n";
 	ViStatus status = VI_SUCCESS;
 	ViFindList resourceList;
@@ -16,11 +20,9 @@ int main(){
 
 	ViSession defaultRM, scopeHandle;
 	ViChar description[VI_FIND_BUFLEN];
-	char dataBuffer[2500];
+	char dataBuffer[datasize];
 
-	int y;
-	int lsb;
-	int masb;
+	
 
 	status = viOpenDefaultRM(&defaultRM);
 
@@ -39,24 +41,36 @@ int main(){
 
 				printf("\nResult count: %d\n",resultCount);
 				printf("\nResult buffer: %s\n",resultBuffer);
-
-				//viWrite(scopeHandle,"DAT:SOU CH1\n",12,&resultCount);
-				//sleep(2);
+				//set scope to CH1
+				viWrite(scopeHandle,"DAT:SOU CH1\n",12,&resultCount);
+				//find conversion factors
+				viWrite(scopeHandle,"CH1:SCA?\n",9,&resultCount);
+				viRead(scopeHandle,diviC,5,&resultCount);
+				// convert char to string
+				sscanf(diviC,"%f",&diviF);
+				//stautus can't be on ViRead
 				status = viWrite(scopeHandle,"CURV?\n",6,&resultCount);
-				sleep(2);
-				viRead(scopeHandle,dataBuffer,2500,&resultCount);
-
+				viRead(scopeHandle,dataBuffer,datasize,&resultCount);
+				//actural data reading into dataBuffer as int
+				
 				if(status == VI_SUCCESS){
-					printf("Read success, datasize: %d\n",resultCount);
-					for(int i = 0; i <128; i++)
+					printf("Read success, datasize: %d, write to wave.txt\n",resultCount);
+					//write to file
+					FILE* write_file;
+					write_file = fopen("wave.txt","w");
+					for(int i = 0; i <datasize; i++)
 					{
-						y = dataBuffer[i];
-						printf("\nRaw = %x, Read = %d",y,y);
+						//float conversion
+						resultHold[i]=dataBuffer[i] * diviF*8.0/256;//multiply by coverstion factor
+						fprintf(write_file,"%d %d %f\n",i,dataBuffer[i],resultHold[i]);
 					}
+					fclose(write_file);
+					printf("write over");
 				}
 				else{
 					printf("Data read error\n");
 				}
+				
 				
 			}
 			else{
