@@ -11,7 +11,7 @@ int main(){
 	char resultBuffer[256];
 	char diviC[5];
 	float diviF = 0;
-	float resultHold[datasize];
+	float dataHold[datasize];
 	char inq[] = "*IDN?/n";
 	ViStatus status = VI_SUCCESS;
 	ViFindList resourceList;
@@ -21,6 +21,9 @@ int main(){
 	ViSession defaultRM, scopeHandle;
 	ViChar description[VI_FIND_BUFLEN];
 	char dataBuffer[datasize];
+
+	float amp;
+	float smooth[datasize];
 
 	
 
@@ -55,14 +58,21 @@ int main(){
 				
 				if(status == VI_SUCCESS){
 					printf("Read success, datasize: %d, write to wave.txt\n",resultCount);
-					//write to file
-					FILE* write_file;
-					write_file = fopen("wave.txt","w");
+					
 					for(int i = 0; i <datasize; i++)
 					{
 						//float conversion
-						resultHold[i]=dataBuffer[i] * diviF*8.0/256;//multiply by coverstion factor
-						fprintf(write_file,"%d %d %f\n",i,dataBuffer[i],resultHold[i]);
+						dataHold[i]=dataBuffer[i] * diviF*8.0/256;//multiply by coverstion factor
+					}
+					amp = find_amp(dataHold,datasize);//find amp
+					ave_curve(dataHold,smooth,20,datasize);//smooth curve and saved to smooth array
+					//write to file
+					FILE* write_file;
+					write_file = fopen("wave.txt","w");
+					printf("amp is %f\n",amp);//print amp
+					for(int i = 0; i <datasize; i++)
+					{
+						fprintf(write_file,"%d %d %f %f\n",i,dataBuffer[i],dataHold[i],smooth[i]);
 					}
 					fclose(write_file);
 					printf("write over");
