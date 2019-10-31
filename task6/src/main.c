@@ -129,10 +129,10 @@ int main(){
 		viWrite(scopeHandle,"DAT:SOU CH1\n",12,&resultCount);
 		viWrite(funcHandle,":OUTP1:MODE NORM\n",17,&resultCount);
 		viWrite(funcHandle,":OUTP1 ON\n",10,&resultCount);
-		// L = 10 mH, C = 22 mF w0= 67500 hz =67.5khz
+		// L = 10 mH, C = 132 nF  hz =67.5khz
 		FILE* write_file;
 		write_file = fopen("wave.txt","w");
-		for (int i = 50000; i <= 80000; i+=500)
+		for (int i = 1000; i <= 6000; i+=500)
 		{
 			printf("freaq: %d\n",i );
 			setfreq(funcHandle,i);
