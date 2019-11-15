@@ -62,7 +62,7 @@ int main(){
 					for(int i = 0; i <datasize; i++)
 					{
 						//float conversion
-						dataHold[i]=dataBuffer[i] * diviF*8.0/256;//multiply by coverstion factor
+						dataHold[i]=dataBuffer[i] * diviF*10.0/256;//multiply by coverstion factor
 					}
 					amp = find_amp(dataHold,datasize);//find amp
 					ave_curve(dataHold,smooth,20,datasize);//smooth curve and saved to smooth array
